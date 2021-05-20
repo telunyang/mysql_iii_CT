@@ -67,7 +67,7 @@ cursor = connection.cursor()
 listData = []
 
 # 準備在 YouTube 搜尋的關鍵字
-keyword = "張學友"
+keyword = "蕭敬騰"
 
 '''
 以 function 名稱，作為爬蟲流程
@@ -137,7 +137,7 @@ def scroll():
     # 在捲動到沒有元素動態產生前，持續捲動
     while totalOffset <= innerHeightOfWindow:
         # 每次移動高度
-        totalOffset += 300
+        totalOffset += 500
         
         # 捲動的 js code
         js_scroll = '''(
@@ -151,19 +151,16 @@ def scroll():
         # 執行 js code
         driver.execute_script(js_scroll)
         
-        # 強制等待
-        sleep(1)
-        
         # 透過執行 js 語法來取得捲動後的當前總高度
         innerHeightOfWindow = driver.execute_script(
             'return window.document.documentElement.scrollHeight;'
         )
         
-        # 強制等待
-        sleep(1)
-        
         # 印出捲動距離
         print("innerHeightOfWindow: {}, totalOffset: {}".format(innerHeightOfWindow, totalOffset))
+
+        # 強制等待
+        sleep(2)
         
         # 為了實驗功能，捲動超過一定的距離，就結束程式
         # if totalOffset >= 1800:
@@ -202,7 +199,7 @@ def parse():
         
         # 放資料到 list 中
         listData.append({
-            "id": youtube_id,
+            "youtube_id": youtube_id,
             "title": aTitle,
             "link": aLink,
             "img": imgSrc
@@ -229,18 +226,15 @@ def saveDB():
         # 將 json 轉成 list (裡面是 dict 集合)
         listResult = json.loads(strJson)
 
-        # 去除重複的 dict
-        listResult = [dict(t) for t in set(tuple(myDict.items()) for myDict in listResult)]
-
         # 決定資料寫入的語法
-        sql = "INSERT INTO `youtube` (`id`, `keyword`, `title`, `link`, `img`) VALUES (%s, %s, %s, %s, %s)"
+        sql = "INSERT INTO `youtube` (`youtube_id`, `keyword`, `title`, `link`, `img`) VALUES (%s, %s, %s, %s, %s)"
         
         # ??????
         for index, obj in enumerate(listResult):
             cursor.execute( 
                 sql, 
                 (
-                    obj['id'], keyword, obj['title'], obj['link'], obj['img']
+                    obj['youtube_id'], keyword, obj['title'], obj['link'], obj['img']
                 ) 
             )
             

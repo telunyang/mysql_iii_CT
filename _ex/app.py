@@ -25,8 +25,9 @@ def index():
     return render_template('index.html')
 
 ''' Web API '''
+# 取得 youtube 所有列表
 @app.route('/youtube', methods=['GET'])
-def getLineStickers():
+def getYouTubeList():
     # 預設回傳訊息
     dictResponse = {"success": False, "info": "查詢失敗"}
     
@@ -57,6 +58,49 @@ def getLineStickers():
 
     # 回傳結果
     return jsonify(dictResponse)
+
+# 刪除或更新指定 youtube id 的資料
+@app.route("/youtube/<id>", methods=["DELETE", "POST"])
+def setYouTubeData(id):
+    # 回傳訊息
+    dictResponse = {"success": False, "info": "系統異常"}
+
+    try:
+        if request.method == 'DELETE':
+            # 預設刪除用的回傳訊息
+            dictResponse["info"] = "刪除失敗"
+            # 查詢資料
+            sql = "DELETE FROM `youtube` WHERE `id` = %s"
+            cursor.execute(sql, (id))
+
+            # 查詢結果列數大於0 ，代表有資料
+            if cursor.rowcount > 0:
+                dictResponse["success"] = True
+                dictResponse["info"] = "刪除成功"
+        
+        elif request.method == 'POST':
+            # 預設更新用的回傳訊息
+            dictResponse["info"] = "更新失敗"
+
+             # 查詢資料
+            sql = "UPDATE `youtube` SET `title` = %s WHERE `id` = %s"
+            cursor.execute(sql, (request.json['title'], id))
+
+            # 查詢結果列數大於0 ，代表有資料
+            if cursor.rowcount > 0:
+                dictResponse["success"] = True
+                dictResponse["info"] = "更新成功"
+
+        # 提交 SQL 執行結果
+        connection.commit()
+    except Exception as e:
+        # 回滾
+        connection.rollback()
+        dictResponse["info"] = f"SQL 執行失敗: {e}"
+
+    # 回傳結果
+    return jsonify(dictResponse)
+
 
 # 主程式區域
 if __name__ == '__main__':
