@@ -1,7 +1,5 @@
 # 實驗機構課程規劃 - MySQL 上課教材
 
-
-
 ## 目次
 - 一、MAMP 安裝（Windows 版本）	1
 - 二、XAMPP安裝（上課使用）	9
@@ -22,9 +20,6 @@
 - 十七、實務操作（三）	100
 - 十八、網頁整合資料庫	110
 - 作業	122
-
-
-
 
 ## 規格
 ### 一、錄製工具：
@@ -48,3 +43,6 @@
 2. fetch 回傳的結果，在網頁當中動態生成元素。
 3. 透過 document 來設定 listener，對所有動態生成元素去註冊 click 與 focusout 事件。
 4. event.target 相關屬性使用最頻繁。
+
+### 五、範例影片
+[ ![實驗機構課程規劃 - MySQL 上課教材](https://i.imgur.com/dFqkMwO.png) ](https://vimeo.com/553444574 "教導高中生建立具有 CRUD 功能的網頁 - 以 YouTube metadata 為例")
