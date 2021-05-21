@@ -59,6 +59,47 @@ def getYouTubeList():
     # 回傳結果
     return jsonify(dictResponse)
 
+# 搜尋特定文字
+@app.route("/youtube/title", methods = ["POST"])
+def getYouTubeData():
+    # 回傳訊息
+    dictResponse = {"success": False, "info": "搜尋失敗"}
+    
+    try:
+        # 取得搜尋字串
+        title = request.json['title']
+
+        # 處理成 SQL 看得懂的格式
+        title = "%" + title.replace(" ", "%") + "%"
+
+        # 查詢資料
+        sql = "SELECT * FROM `youtube` WHERE `title` LIKE %s"
+        cursor.execute(sql, {title})
+
+        # 查詢結果列數大於0 ，代表有資料
+        if cursor.rowcount > 0:
+            # 將查詢結果轉成 list 型態 (list 裡頭元素都是 dict)
+            results = cursor.fetchall()
+            
+            # 新增屬性 results，將查詢結果送回前端頁面
+            dictResponse["success"] = True
+            dictResponse["info"] = "查詢成功"
+            dictResponse["results"] = results
+        else:
+            dictResponse["info"] = "查詢結果為空"
+
+        # 提交 SQL 執行結果
+        connection.commit()
+    except Exception as e:
+        # 回滾
+        connection.rollback()
+        dictResponse["info"] = f"SQL 執行失敗: {e}"
+
+    # 回傳結果
+    return jsonify(dictResponse)
+
+    
+
 # 刪除或更新指定 youtube id 的資料
 @app.route("/youtube/<id>", methods=["DELETE", "POST"])
 def setYouTubeData(id):
@@ -69,6 +110,7 @@ def setYouTubeData(id):
         if request.method == 'DELETE':
             # 預設刪除用的回傳訊息
             dictResponse["info"] = "刪除失敗"
+            
             # 查詢資料
             sql = "DELETE FROM `youtube` WHERE `id` = %s"
             cursor.execute(sql, (id))
